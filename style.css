@@ -1,0 +1,16 @@
+body { font-family: Arial; padding: 20px; }
+.filters { margin-bottom: 20px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+.item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+.item img { width: 100%; border-radius: 8px; }
+.ready { color: green; }
+.empty { color: red; }

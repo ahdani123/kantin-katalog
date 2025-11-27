@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Katalog Kantin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Katalog Barang Kantin</h1>
+
+<div class="filters">
+  <select id="jenisFilter">
+    <option value="all">Semua Jenis</option>
+  </select>
+
+  <select id="hargaFilter">
+    <option value="all">Semua Harga</option>
+    <option value="1">Di bawah 3000</option>
+    <option value="2">3000 - 5000</option>
+    <option value="3">Di atas 5000</option>
+  </select>
+</div>
+
+<div id="productList" class="grid"></div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

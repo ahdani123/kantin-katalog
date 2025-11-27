@@ -1,0 +1,30 @@
+[
+  {
+    "nama": "Indomie Goreng",
+    "harga": 3500,
+    "jenis": "Mie Instan",
+    "stok": 12,
+    "gambar": "images/indomie-goreng.jpg"
+  },
+  {
+    "nama": "Pop Ice Coklat",
+    "harga": 4000,
+    "jenis": "Minuman",
+    "stok": 0,
+    "gambar": "images/pop-ice.jpg"
+  },
+  {
+    "nama": "Kopi Kapal Api",
+    "harga": 2000,
+    "jenis": "Minuman Hangat",
+    "stok": 8,
+    "gambar": "images/kopi-kapal-api.jpg"
+  },
+  {
+    "nama": "Chocolatos",
+    "harga": 1000,
+    "jenis": "Snack",
+    "stok": 30,
+    "gambar": "images/chocolatos.jpg"
+  }
+]
