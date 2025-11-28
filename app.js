@@ -1,55 +1,47 @@
-// URL CSV Google Sheets kamu
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-Iw7Ou8GyhlBVW_aVhj6xPlncGhtMgYBzzHxnCXMkY5-pNp0lAzEXgov7SM8MlrvaKASy0-AQzQk4/pub?output=csv";
+// URL Google Sheets JSON (GVIZ)
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-Iw7Ou8GyhlBVW_aVhj6xPlncGhtMgYBzzHxnCXMkY5-pNp0lAzEXgov7SM8MlrvaKASy0-AQzQk4/gviz/tq?tqx=out:json";
 
-// Fungsi untuk mengambil CSV
-async function fetchCSV(url) {
-  const response = await fetch(url);
-  const data = await response.text();
-  return parseCSV(data);
-}
+async function loadData() {
+    const response = await fetch(sheetURL);
+    let text = await response.text();
 
-// Parse CSV menjadi array objek
-function parseCSV(csv) {
-  const lines = csv.split("\n").map(l => l.trim());
-  const headers = lines[0].split(",");
+    // GVIZ JSON memiliki karakter tambahan "google.visualization.Query.setResponse(...)"
+    text = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
 
-  const items = lines.slice(1).map(line => {
-    const cols = line.split(",");
-    const obj = {};
-    headers.forEach((h, i) => {
-      obj[h.trim()] = cols[i] ? cols[i].trim() : "";
+    const data = JSON.parse(text);
+
+    const rows = data.table.rows.map(r => {
+        return {
+            nama: r.c[0]?.v || "",
+            harga: r.c[1]?.v || "",
+            jenis: r.c[2]?.v || "",
+            stok: r.c[3]?.v || "",
+            gambar: r.c[4]?.v || ""
+        };
     });
-    return obj;
-  });
 
-  return items;
+    displayProducts(rows);
 }
 
-// Menampilkan barang
 function displayProducts(products) {
-  const container = document.getElementById("product-list");
-  container.innerHTML = "";
+    const container = document.getElementById("product-list");
+    container.innerHTML = "";
 
-  products.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "product-card";
+    products.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "product-card";
 
-    card.innerHTML = `
-      <img src="${item.gambar}" class="product-image" alt="${item.nama}">
-      <h3>${item.nama}</h3>
-      <p>Jenis: ${item.jenis}</p>
-      <p>Harga: Rp ${item.harga}</p>
-      <p>Stok: ${item.stok}</p>
-    `;
+        card.innerHTML = `
+            <img src="${item.gambar}" class="product-image" alt="${item.nama}">
+            <h3>${item.nama}</h3>
+            <p>Jenis: ${item.jenis}</p>
+            <p>Harga: Rp ${item.harga}</p>
+            <p>Stok: ${item.stok}</p>
+        `;
 
-    container.appendChild(card);
-  });
+        container.appendChild(card);
+    });
 }
 
-// Mulai load data
-fetchCSV(sheetURL)
-  .then(data => {
-    console.log("Data berhasil di-load:", data);
-    displayProducts(data);
-  })
-  .catch(err => console.error("Error loading data:", err));
+loadData();
+              
