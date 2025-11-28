@@ -1,26 +1,24 @@
-// URL Google Sheets JSON (GVIZ)
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-Iw7Ou8GyhlBVW_aVhj6xPlncGhtMgYBzzHxnCXMkY5-pNp0lAzEXgov7SM8MlrvaKASy0-AQzQk4/gviz/tq?tqx=out:json";
+// URL Google Sheets CSV
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-Iw7Ou8GyhlBVW_aVhj6xPlncGhtMgYBzzHxnCXMkY5-pNp0lAzEXgov7SM8MlrvaKASy0-AQzQk4/pub?output=csv";
 
 async function loadData() {
     const response = await fetch(sheetURL);
-    let text = await response.text();
+    const csv = await response.text();
 
-    // GVIZ JSON memiliki karakter tambahan "google.visualization.Query.setResponse(...)"
-    text = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    // Ubah CSV → Array
+    const rows = csv.trim().split("\n").map(row => row.split(","));
+    const header = rows.shift().map(h => h.trim());
 
-    const data = JSON.parse(text);
-
-    const rows = data.table.rows.map(r => {
-        return {
-            nama: r.c[0]?.v || "",
-            harga: r.c[1]?.v || "",
-            jenis: r.c[2]?.v || "",
-            stok: r.c[3]?.v || "",
-            gambar: r.c[4]?.v || ""
-        };
+    // Ubah CSV → JSON
+    const data = rows.map(row => {
+        let obj = {};
+        header.forEach((h, i) => {
+            obj[h] = row[i] ? row[i].trim() : "";
+        });
+        return obj;
     });
 
-    displayProducts(rows);
+    displayProducts(data);
 }
 
 function displayProducts(products) {
@@ -44,4 +42,3 @@ function displayProducts(products) {
 }
 
 loadData();
-              
