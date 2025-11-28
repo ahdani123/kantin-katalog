@@ -1,45 +1,55 @@
-fetch('products.json')
-  .then(r => r.json())
-  .then(data => {
-    const list = document.getElementById('productList');
-    const jenisFilter = document.getElementById('jenisFilter');
-    const hargaFilter = document.getElementById('hargaFilter');
+// URL CSV Google Sheets kamu
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-Iw7Ou8GyhlBVW_aVhj6xPlncGhtMgYBzzHxnCXMkY5-pNp0lAzEXgov7SM8MlrvaKASy0-AQzQk4/pub?output=csv";
 
-    const jenisSet = ["all", ...new Set(data.map(d => d.jenis))];
-    jenisSet.forEach(j => {
-      jenisFilter.innerHTML += `<option value="${j}">${j}</option>`;
+// Fungsi untuk mengambil CSV
+async function fetchCSV(url) {
+  const response = await fetch(url);
+  const data = await response.text();
+  return parseCSV(data);
+}
+
+// Parse CSV menjadi array objek
+function parseCSV(csv) {
+  const lines = csv.split("\n").map(l => l.trim());
+  const headers = lines[0].split(",");
+
+  const items = lines.slice(1).map(line => {
+    const cols = line.split(",");
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = cols[i] ? cols[i].trim() : "";
     });
-
-    function hargaRange(harga, filter) {
-      if (filter === "1") return harga < 3000;
-      if (filter === "2") return harga >= 3000 && harga <= 5000;
-      if (filter === "3") return harga > 5000;
-      return true;
-    }
-
-    function render() {
-      list.innerHTML = "";
-      const jf = jenisFilter.value;
-      const hf = hargaFilter.value;
-
-      data
-        .filter(p => (jf === "all" || p.jenis === jf))
-        .filter(p => hargaRange(p.harga, hf))
-        .forEach(p => {
-          list.innerHTML += `
-          <div class="item">
-            <img src="${p.gambar}">
-            <h3>${p.nama}</h3>
-            <p>Rp ${p.harga}</p>
-            <small>Jenis: ${p.jenis}</small><br>
-            <strong class="${p.stok > 0 ? 'ready' : 'empty'}">
-              ${p.stok > 0 ? 'Stok: ' + p.stok : 'Habis'}
-            </strong>
-          </div>`;
-        });
-    }
-
-    render();
-    jenisFilter.onchange = render;
-    hargaFilter.onchange = render;
+    return obj;
   });
+
+  return items;
+}
+
+// Menampilkan barang
+function displayProducts(products) {
+  const container = document.getElementById("product-list");
+  container.innerHTML = "";
+
+  products.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      <img src="${item.gambar}" class="product-image" alt="${item.nama}">
+      <h3>${item.nama}</h3>
+      <p>Jenis: ${item.jenis}</p>
+      <p>Harga: Rp ${item.harga}</p>
+      <p>Stok: ${item.stok}</p>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+// Mulai load data
+fetchCSV(sheetURL)
+  .then(data => {
+    console.log("Data berhasil di-load:", data);
+    displayProducts(data);
+  })
+  .catch(err => console.error("Error loading data:", err));
